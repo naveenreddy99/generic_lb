@@ -34,18 +34,18 @@ listener = {"lstn1" = { lb_name                             = "alb-whitelist-acc
                                                               }
                         redirect                            = {}
                         forward                             = {target_group_name = "test"
-                                                              }
-                        listener_rules                      = {}
+                                                                }
                         tags                                = {}
                         }
 }
 
 listener_rules = {"rule1" = {listener_name = "alb-whitelist-lstn1"
-                             priority                   = 1
-                             action   = {type = "forward"
-                                         target_group_name = "test"
-                                        }
-
+                             priority               = 1
+                             forward_action         =  {type = "forward"
+                                                        target_group_name = "test"
+                                                        }
+                             path_pattern_condition = {values = ["/api/v1/*"]}
+                             host_header_condition  = {values = ["int-webforward-api.markmonitor"] }
                             }
 
 }
