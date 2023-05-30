@@ -116,21 +116,47 @@ resource "aws_lb_listener_rule" "lstn_rule" {
   priority     = each.value.priority
 
   dynamic "action" {
-    for_each = length(each.value.action) > 0 ? [each.value.action] : []
+    for_each = length(each.value.forward_action) > 0 ? [each.value.forward_action] : []
     content {
       type             = try(action.value.type, "forward")
       target_group_arn = local.tg_name_id[action.value.target_group_name]
     }
   }
 
-  condition {
-    path_pattern {
-      values = ["/api/v1/*"]
+  dynamic "condition" {
+    for_each = length(each.value.path_pattern_condition) > 0 ? [each.value.path_pattern_condition] : []
+    content {
+      path_pattern {
+        values = condition.value.values
+      }
     }
   }
-  condition {
-    host_header {
-      values = ["int-webforward-api.markmonitor"]
+
+  dynamic "condition" {
+    for_each = length(each.value.host_header_condition) > 0 ? [each.value.host_header_condition] : []
+    content {
+      host_header {
+        values = condition.value.values
+      }
     }
   }
+
+  # dynamic "condition" {
+  #   for_each = length(each.value.condition) > 0 ? [each.value.condition] : []
+
+  #   content {
+  #     field  = condition.value.field
+  #     values = condition.value.values
+  #   }
+  # }
+  # condition {
+  #   path_pattern {
+  #     values = ["/api/v1/*"]
+  #   }
+  # }
+  # condition {
+  #   host_header {
+  #     values = ["int-webforward-api.markmonitor"]
+  #   }
+  # }
 }
